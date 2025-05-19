@@ -1,0 +1,5 @@
+01;gonzalo;caballo;15/05/2020;Venta
+02;Pablo;chivo;20/06/2021;Parto
+03;fifi;pitbull;25/01/2000;Vacunación
+04;vera;Pastor Aleman;05/10/2023;Vacunación
+05;lara;ternera;19/02/2025

@@ -1,0 +1,3 @@
+samuel;samuel123@gmail.com;12345678;Usuario
+yeimar;yeimar123@gmail.com;12345678;Administrador
+dennis;dennis123@gmail.com;12345;Administrador
