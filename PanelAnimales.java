@@ -9,7 +9,7 @@ public class PanelAnimales extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(rol.equals("Administrador") ? 5 : 1, 1, 10, 10));
+        panel.setLayout(new GridLayout(rol.equals("Administrador") ? 6 : 1, 1, 10, 10));
         panel.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
         panel.setBackground(new Color(245, 245, 245));
 
@@ -18,19 +18,23 @@ public class PanelAnimales extends JFrame {
         btnVer.addActionListener(e -> new VerAnimales(rol));
         panel.add(btnVer);
 
-
-
         // Botones exclusivos para administrador
         if (rol.equals("Administrador")) {
             JButton btnAgregar = createStyledButton("Agregar Animal");
             btnAgregar.addActionListener(e -> new AgregarAnimal());
             panel.add(btnAgregar);
-            
+
             JButton btnModificar = createStyledButton("Modificar Animal");
             btnModificar.addActionListener(e -> new ActualizarAnimal());
             panel.add(btnModificar);
 
-            panel.add(createStyledButton("Actualizar Lista"));
+            JButton btnActualizar = createStyledButton("Actualizar Lista");
+            panel.add(btnActualizar);
+
+            // NUEVO BOTÓN DE INVENTARIO
+            JButton btnInventario = createStyledButton("Inventario");
+            btnInventario.addActionListener(e -> new InventarioPanel());
+            panel.add(btnInventario);
         }
 
         add(panel);

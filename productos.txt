@@ -1,0 +1,10 @@
+Nombre: Vacuna A | Tipo: Medicamento | Cantidad: 20 unidad | Stock Mínimo: 5 | Vence: 2025-08-20
+Nombre: Vacuna B | Tipo: Medicamento | Cantidad: 25 unidad | Stock Mínimo: 5 | Vence: 2025-06-18
+Nombre: Heno | Tipo: Alimento | Cantidad: 25 kg | Stock Mínimo: 8 | Vence: 2025-06-18
+Nombre: Maiz | Tipo: Alimento | Cantidad: 5 kg | Stock Mínimo: 5 | Vence: 2025-06-20
+Nombre: Leche | Tipo: Alimento | Cantidad: 25 L | Stock Mínimo: 5 | Vence: 2025-06-30
+Nombre: Cuido | Tipo: Alimento | Cantidad: 20 kg | Stock Mínimo: 5 | Vence: 2025-05-30
+Nombre: Pastillas A | Tipo: Alimento | Cantidad: 5 unidad | Stock Mínimo: 5 | Vence: 2025-05-30
+Nombre: Patillas A | Tipo: Medicamento | Cantidad: 5 kg | Stock Mínimo: 5 | Vence: 2025-05-30
+Nombre: Pastillas B | Tipo: Medicamento | Cantidad: 30 unidad | Stock Mínimo: 10 | Vence: 2025-05-30
+Nombre: Antibiotico | Tipo: Medicamento | Cantidad: 10 unidad | Stock Mínimo: 5 | Vence: 2025-05-26
