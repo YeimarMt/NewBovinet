@@ -9,6 +9,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.table.*;
 
 public class VerAlimentos extends JFrame {
+    
 
     private JTable tabla;
     private DefaultTableModel modelo;

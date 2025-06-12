@@ -1,1 +1,5 @@
 ID: 01 - Evento: Fallecimiento
+01;Control Sanitario;11/02/2025
+01;Vacunación;21/03/2025
+01;Preñez;29/04/2025
+01;Vacunación;31/05/2025

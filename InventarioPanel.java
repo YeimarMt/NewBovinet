@@ -35,7 +35,11 @@ public class InventarioPanel extends JFrame {
         }));
 
         cardsPanel.add(createCard("Ver Productos Vencidos", "img/vencidos.jpg", () -> {
-            new VerMedicamentos();
+            new VerProductosVencidos();
+        }));
+
+        cardsPanel.add(createCard("Modificar Productos", "img/modificar.png", () -> {
+            new ModificarProducto(null); // null para usar el diálogo de selección
         }));
 
         mainPanel.add(cardsPanel, BorderLayout.CENTER);

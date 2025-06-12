@@ -11,7 +11,7 @@ public class AgregarAnimal extends JFrame {
 
     public AgregarAnimal() {
         setTitle("Agregar Animal");
-        setSize(400, 350);
+        setSize(400, 300);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new GridBagLayout());
@@ -49,7 +49,7 @@ public class AgregarAnimal extends JFrame {
         razaField.setFont(font);
         add(razaField, gbc);
 
-        // Fecha con JDateChooser
+        // Fecha de Nacimiento
         gbc.gridx = 0; gbc.gridy = 3;
         add(new JLabel("Fecha Nacimiento:"), gbc);
         gbc.gridx = 1;
@@ -93,7 +93,6 @@ public class AgregarAnimal extends JFrame {
             JOptionPane.showMessageDialog(this, "La fecha no puede ser futura.", "Fecha inválida", JOptionPane.WARNING_MESSAGE);
             return;
         }
-
 
         String fecha = new SimpleDateFormat("dd/MM/yyyy").format(fechaChooser.getDate());
         String linea = id + ";" + nombre + ";" + raza + ";" + fecha;

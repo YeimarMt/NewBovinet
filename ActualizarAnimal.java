@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.swing.*;
 
+
 public class ActualizarAnimal extends JFrame {
     private JTextField idField, nombreField, razaField;
     private JDateChooser fechaChooser;
@@ -110,40 +111,75 @@ public class ActualizarAnimal extends JFrame {
         add(guardarBtn, gbc);
 
         // Acciones
-        buscarBtn.addActionListener(e -> buscarAnimal());
+        buscarBtn.addActionListener(e -> {
+            String id = idField.getText().trim();
+            if (!id.isEmpty()) {
+                buscarAnimalParaModificar(id);
+            } else {
+                JOptionPane.showMessageDialog(this, "Ingresa un ID válido.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
         guardarBtn.addActionListener(e -> guardarEvento());
 
         setVisible(true);
     }
 
-    private void buscarAnimal() {
-        String id = idField.getText().trim();
-        if (id.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Ingresa el ID del animal.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
+    private void buscarAnimalParaModificar(String idBuscado) {
+    File archivo = new File("animales.txt");
+    if (!archivo.exists()) {
+        JOptionPane.showMessageDialog(this, "Archivo animales.txt no encontrado.", "Error", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
 
-        try (BufferedReader reader = new BufferedReader(new FileReader("animales.txt"))) {
-            String linea;
-            while ((linea = reader.readLine()) != null) {
-                String[] datos = linea.split(";");
-                if (datos[0].equals(id)) {
-                    nombreField.setText(datos[1]);
-                    razaField.setText(datos[2]);
-                    try {
-                        Date fecha = new SimpleDateFormat("dd/MM/yyyy").parse(datos[3]);
-                        fechaChooser.setDate(fecha);
-                    } catch (ParseException ex) {
-                        fechaChooser.setDate(null);
-                    }
+    try (BufferedReader reader = new BufferedReader(new FileReader(archivo))) {
+        String linea;
+        boolean encontrado = false;
+
+        while ((linea = reader.readLine()) != null) {
+            String[] datos = linea.split(";");
+            if (datos.length >= 4 && datos[0].equals(idBuscado)) {
+                encontrado = true;
+
+                if (linea.contains(";Fallecimiento;") || linea.endsWith(";Fallecimiento")) {
+                    JOptionPane.showMessageDialog(this,
+                        "Este animal ya fue dado de baja.\nNo se permite su modificación.",
+                        "Acceso restringido", JOptionPane.WARNING_MESSAGE);
+
+                    nombreField.setEditable(false);
+                    razaField.setEditable(false);
+                    fechaChooser.setEnabled(false);
+                    eventoBox.setEnabled(false);
                     return;
                 }
+
+                nombreField.setText(datos[1]);
+                razaField.setText(datos[2]);
+
+                try {
+                    Date fecha = new SimpleDateFormat("dd/MM/yyyy").parse(datos[3]);
+                    fechaChooser.setDate(fecha);
+                } catch (ParseException ex) {
+                    fechaChooser.setDate(null);
+                }
+
+                nombreField.setEditable(true);
+                razaField.setEditable(true);
+                fechaChooser.setEnabled(true);
+                eventoBox.setEnabled(true);
+                return;
             }
-            JOptionPane.showMessageDialog(this, "Animal no encontrado.", "Aviso", JOptionPane.WARNING_MESSAGE);
-        } catch (IOException ex) {
-            JOptionPane.showMessageDialog(this, "Error al leer archivo.", "Error", JOptionPane.ERROR_MESSAGE);
         }
+
+        if (!encontrado) {
+            JOptionPane.showMessageDialog(this, "No se encontró ningún animal con ese ID.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+
+    } catch (IOException e) {
+        e.printStackTrace();
     }
+}
+
 
     private void guardarEvento() {
         String id = idField.getText().trim();

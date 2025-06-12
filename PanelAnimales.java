@@ -9,7 +9,7 @@ public class PanelAnimales extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(rol.equals("Administrador") ? 6 : 1, 1, 10, 10));
+        panel.setLayout(new GridLayout(rol.equals("Administrador") ? 7 : 2, 1, 10, 10));
         panel.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
         panel.setBackground(new Color(245, 245, 245));
 
@@ -17,6 +17,11 @@ public class PanelAnimales extends JFrame {
         JButton btnVer = createStyledButton("Ver Animales");
         btnVer.addActionListener(e -> new VerAnimales(rol));
         panel.add(btnVer);
+
+        // Botón para controles sanitarios pendientes, disponible para todos
+        JButton btnControlesPendientes = createStyledButton("Controles Sanitarios Pendientes");
+        btnControlesPendientes.addActionListener(e -> new ControlesPendientes(rol));
+        panel.add(btnControlesPendientes);
 
         // Botones exclusivos para administrador
         if (rol.equals("Administrador")) {
@@ -28,10 +33,21 @@ public class PanelAnimales extends JFrame {
             btnModificar.addActionListener(e -> new ActualizarAnimal());
             panel.add(btnModificar);
 
+            JButton btnRegistrarEvento = createStyledButton("Registrar Evento");
+            btnRegistrarEvento.addActionListener(e -> new RegistrarEvento());
+            panel.add(btnRegistrarEvento);
+
+            JButton btnVerHojas = createStyledButton("Ver Hojas de Vida");
+            btnVerHojas.addActionListener(e -> new VerHojasDeVida());
+            panel.add(btnVerHojas);
+
+            JButton btnDarBaja = createStyledButton("Dar de Baja Animal");
+            btnDarBaja.addActionListener(e -> new DarDeBajaAnimal());
+            panel.add(btnDarBaja);
+
             JButton btnActualizar = createStyledButton("Actualizar Lista");
             panel.add(btnActualizar);
 
-            // NUEVO BOTÓN DE INVENTARIO
             JButton btnInventario = createStyledButton("Inventario");
             btnInventario.addActionListener(e -> new InventarioPanel());
             panel.add(btnInventario);
@@ -41,7 +57,6 @@ public class PanelAnimales extends JFrame {
         setVisible(true);
     }
 
-    // Método para aplicar estilos a cada botón
     private JButton createStyledButton(String text) {
         JButton button = new JButton(text);
         button.setBackground(new Color(46, 139, 87));
