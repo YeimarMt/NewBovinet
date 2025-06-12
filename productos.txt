@@ -1,4 +1,4 @@
-Nombre: Vacuna A | Tipo: Medicamento | Cantidad: 20 unidad | Stock Mínimo: 5 | Vence: 2025-08-20
+Nombre: Vacuna A | Tipo: Medicamento | Cantidad: 20 unidad| Stock Mínimo: 5 | Vence: 2025-08-20
 Nombre: Vacuna B | Tipo: Medicamento | Cantidad: 25 unidad | Stock Mínimo: 5 | Vence: 2025-06-18
 Nombre: Heno | Tipo: Alimento | Cantidad: 20 kg | Stock Mínimo: 8 | Vence: 2025-06-28
 Nombre: Maiz | Tipo: Alimento | Cantidad: 25 kg | Stock Mínimo: 5 | Vence: 2025-06-30

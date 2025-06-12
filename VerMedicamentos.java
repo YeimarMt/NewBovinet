@@ -1,32 +1,55 @@
-import java.awt.*;
-import java.io.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Font;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import javax.swing.*;
+
+import javax.swing.DefaultCellEditor;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.RowFilter;
+import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.table.*;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableRowSorter;
 
 public class VerMedicamentos extends JFrame {
 
     private JTable tabla;
     private DefaultTableModel modelo;
-    private TableRowSorter<DefaultTableModel> sorter;  // Para filtro y orden
+    private TableRowSorter<DefaultTableModel> sorter;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     public VerMedicamentos() {
         setTitle("Ver Medicamentos");
-        setSize(700, 550);
+        setSize(800, 550);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setResizable(false);
 
-        String[] columnas = {"Nombre", "Tipo", "Cantidad", "Unidad", "Stock Mínimo", "Fecha Vencimiento"};
+        String[] columnas = {"Nombre", "Tipo", "Cantidad", "Unidad", "Stock Mínimo", "Fecha Vencimiento", "↕️ Movimiento"};
         modelo = new DefaultTableModel(columnas, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false; // No editable directamente
+                return column == 6;
             }
         };
 
@@ -35,11 +58,9 @@ public class VerMedicamentos extends JFrame {
         tabla.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         tabla.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 14));
 
-        // Configurar sorter para ordenar y filtrar
         sorter = new TableRowSorter<>(modelo);
         tabla.setRowSorter(sorter);
 
-        // Renderizado para colorear filas según estado (igual que antes)
         tabla.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value,
@@ -88,21 +109,21 @@ public class VerMedicamentos extends JFrame {
             }
         });
 
-        // Campo filtro arriba
+        tabla.getColumn("↕️ Movimiento").setCellRenderer(new ButtonRenderer());
+        tabla.getColumn("↕️ Movimiento").setCellEditor(new ButtonEditor(new JCheckBox()));
+
         JPanel panelFiltro = new JPanel(new BorderLayout());
         JLabel etiquetaFiltro = new JLabel("Buscar: ");
         JTextField campoFiltro = new JTextField();
         panelFiltro.add(etiquetaFiltro, BorderLayout.WEST);
         panelFiltro.add(campoFiltro, BorderLayout.CENTER);
 
-        // Añadir listener para filtrar según texto
         campoFiltro.getDocument().addDocumentListener(new DocumentListener() {
             private void filtrar() {
                 String texto = campoFiltro.getText();
                 if (texto.trim().length() == 0) {
                     sorter.setRowFilter(null);
                 } else {
-                    // Filtra en todas las columnas que quieras, aquí en 0(nombre),1(tipo),5(fecha)
                     sorter.setRowFilter(RowFilter.regexFilter("(?i)" + texto, 0, 1, 5));
                 }
             }
@@ -123,11 +144,7 @@ public class VerMedicamentos extends JFrame {
     }
 
     private void cargarMedicamentos() {
-        modelo.setRowCount(0); // Limpiar
-
-        ArrayList<String> vencidos = new ArrayList<>();
-        ArrayList<String> proximosAVencer = new ArrayList<>();
-        ArrayList<String> stockBajo = new ArrayList<>();
+        modelo.setRowCount(0);
 
         try (BufferedReader reader = new BufferedReader(new FileReader("productos.txt"))) {
             String linea;
@@ -138,53 +155,16 @@ public class VerMedicamentos extends JFrame {
                 String tipo = "Medicamento";
                 String cantidadStr = extraerCampo(linea, "Cantidad:");
                 String[] partes = cantidadStr.split(" ");
-                int cantidad = 0;
-                String unidad = "";
-                if (partes.length >= 1) cantidad = Integer.parseInt(partes[0]);
-                if (partes.length >= 2) unidad = partes[1];
+                int cantidad = Integer.parseInt(partes[0]);
+                String unidad = partes.length >= 2 ? partes[1] : "";
 
                 int stockMin = Integer.parseInt(extraerCampo(linea, "Stock Mínimo:"));
                 String vence = extraerCampo(linea, "Vence:");
 
-                modelo.addRow(new Object[]{nombre, tipo, cantidad, unidad, stockMin, vence});
-
-                LocalDate hoy = LocalDate.now();
-                LocalDate fechaVence = LocalDate.parse(vence, formatter);
-                long diasParaVencer = java.time.temporal.ChronoUnit.DAYS.between(hoy, fechaVence);
-
-                if (fechaVence.isBefore(hoy)) {
-                    vencidos.add(nombre);
-                } else if (diasParaVencer <= 7) {
-                    proximosAVencer.add(nombre + " (vence en " + diasParaVencer + " días)");
-                }
-
-                if (cantidad <= stockMin) {
-                    stockBajo.add(nombre + " (stock: " + cantidad + ")");
-                }
+                modelo.addRow(new Object[]{nombre, tipo, cantidad, unidad, stockMin, vence, "Mover"});
             }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Error leyendo productos.txt: " + e.getMessage());
-        }
-
-        StringBuilder alerta = new StringBuilder();
-        if (!vencidos.isEmpty()) {
-            alerta.append("Medicamentos vencidos:\n");
-            for (String p : vencidos) alerta.append(" - ").append(p).append("\n");
-            alerta.append("\n");
-        }
-        if (!proximosAVencer.isEmpty()) {
-            alerta.append("Medicamentos próximos a vencer (menos de 7 días):\n");
-            for (String p : proximosAVencer) alerta.append(" - ").append(p).append("\n");
-            alerta.append("\n");
-        }
-        if (!stockBajo.isEmpty()) {
-            alerta.append("Medicamentos con stock bajo:\n");
-            for (String p : stockBajo) alerta.append(" - ").append(p).append("\n");
-            alerta.append("\n");
-        }
-
-        if (alerta.length() > 0) {
-            JOptionPane.showMessageDialog(this, alerta.toString(), "Alertas importantes", JOptionPane.WARNING_MESSAGE);
         }
     }
 
@@ -198,5 +178,113 @@ public class VerMedicamentos extends JFrame {
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(VerMedicamentos::new);
+    }
+}
+
+class ButtonRenderer extends JButton implements TableCellRenderer {
+    public ButtonRenderer() {
+        setOpaque(true);
+    }
+    public Component getTableCellRendererComponent(JTable table, Object value,
+                                                   boolean isSelected, boolean hasFocus,
+                                                   int row, int column) {
+        setText((value == null) ? "" : value.toString());
+        return this;
+    }
+}
+
+class ButtonEditor extends DefaultCellEditor {
+    protected JButton button;
+    private String label;
+    private boolean isPushed;
+    private JTable table;
+
+    public ButtonEditor(JCheckBox checkBox) {
+        super(checkBox);
+        button = new JButton();
+        button.setOpaque(true);
+        button.addActionListener(e -> fireEditingStopped());
+    }
+
+    public Component getTableCellEditorComponent(JTable table, Object value,
+                                                 boolean isSelected, int row, int column) {
+        this.table = table;
+        label = (value == null) ? "" : value.toString();
+        button.setText(label);
+        isPushed = true;
+        return button;
+    }
+
+    public Object getCellEditorValue() {
+        if (isPushed) {
+            int row = table.getSelectedRow();
+            String nombre = table.getValueAt(row, 0).toString();
+            int cantidadActual = Integer.parseInt(table.getValueAt(row, 2).toString());
+            String unidad = table.getValueAt(row, 3).toString();
+
+            String[] opciones = {"Entrada", "Salida"};
+            int eleccion = JOptionPane.showOptionDialog(null,
+                    "¿Qué deseas hacer con " + nombre + "?",
+                    "Movimiento de stock",
+                    JOptionPane.DEFAULT_OPTION,
+                    JOptionPane.QUESTION_MESSAGE,
+                    null, opciones, opciones[0]);
+
+            if (eleccion != -1) {
+                String tipoMovimiento = opciones[eleccion];
+                String input = JOptionPane.showInputDialog("Ingrese la cantidad a " + tipoMovimiento.toLowerCase() + ":");
+
+                if (input != null && input.matches("\\d+")) {
+                    int cantidad = Integer.parseInt(input);
+                    if (tipoMovimiento.equals("Salida") && cantidad > cantidadActual) {
+                        JOptionPane.showMessageDialog(null, "No se puede retirar más de lo disponible.");
+                    } else {
+                        int nuevaCantidad = tipoMovimiento.equals("Entrada") ?
+                                cantidadActual + cantidad : cantidadActual - cantidad;
+
+                        table.setValueAt(nuevaCantidad, row, 2);
+
+                        try {
+                            File archivo = new File("productos.txt");
+                            ArrayList<String> lineas = new ArrayList<>();
+                            BufferedReader reader = new BufferedReader(new FileReader(archivo));
+                            String linea;
+                            while ((linea = reader.readLine()) != null) {
+                                if (linea.contains("Nombre: " + nombre) && linea.contains("Tipo: Medicamento")) {
+                                    String[] partes = linea.split("\\|");
+                                    for (int i = 0; i < partes.length; i++) {
+                                        if (partes[i].trim().startsWith("Cantidad:")) {
+                                            partes[i] = " Cantidad: " + nuevaCantidad + " " + unidad;
+                                            break;
+                                        }
+                                    }
+                                    linea = String.join("|", partes);
+                                }
+                                lineas.add(linea);
+                            }
+                            reader.close();
+                            PrintWriter writer = new PrintWriter(new FileWriter(archivo));
+                            for (String l : lineas) {
+                                writer.println(l);
+                            }
+                            writer.close();
+                        } catch (IOException e) {
+                            JOptionPane.showMessageDialog(null, "Error al actualizar archivo: " + e.getMessage());
+                        }
+                    }
+                }
+            }
+        }
+        isPushed = false;
+        return label;
+    }
+
+    public boolean stopCellEditing() {
+        isPushed = false;
+        return super.stopCellEditing();
+    }
+
+    protected void fireEditingStopped() {
+        super.fireEditingStopped();
     }
 }
