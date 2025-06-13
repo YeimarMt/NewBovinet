@@ -1,0 +1,12 @@
+=== REPORTE DE PRODUCTOS Y MEDICAMENTOS ===
+
+Nombre: Heno | Tipo: Alimento | Cantidad: 25 kg | Stock Mínimo: 5 | Vence: 2025-06-18
+Nombre: Maíz | Tipo: Alimento | Cantidad: 40 kg | Stock Mínimo: 10 | Vence: 2025-07-01
+Nombre: Sorgo | Tipo: Alimento | Cantidad: 35 kg | Stock Mínimo: 8 | Vence: 2025-06-30
+Nombre: Sal mineral | Tipo: Alimento | Cantidad: 10 kg | Stock Mínimo: 3 | Vence: 2025-08-10
+Nombre: Concentrado | Tipo: Alimento | Cantidad: 50 kg | Stock Mínimo: 12 | Vence: 2025-07-15
+Nombre: Ivermectina | Tipo: Medicamento | Cantidad: 10 ml | Stock Mínimo: 2 | Vence: 2025-06-25
+Nombre: Oxitetraciclina | Tipo: Medicamento | Cantidad: 20 ml | Stock Mínimo: 4 | Vence: 2025-07-05
+Nombre: Vitaminas A-D-E | Tipo: Medicamento | Cantidad: 15 ml | Stock Mínimo: 3 | Vence: 2025-08-01
+Nombre: Antiparasitario X | Tipo: Medicamento | Cantidad: 25 ml | Stock Mínimo: 5 | Vence: 2025-06-20
+Nombre: Vacuna Fiebre Aftosa | Tipo: Medicamento | Cantidad: 30 ml | Stock Mínimo: 6 | Vence: 2025-06-19

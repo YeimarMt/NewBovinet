@@ -1,14 +1,24 @@
-import javax.swing.*;
+import java.awt.BorderLayout;
+import java.awt.Desktop;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
-import java.awt.*;
-import java.io.*;
-import com.itextpdf.text.*;
-import com.itextpdf.text.pdf.*;
 
 public class ReporteProductos extends JFrame {
     private JTable tablaProductos;
     private DefaultTableModel modeloTabla;
-    private JButton btnGenerarPDF;
+    private JButton btnExportarTxt;
 
     public ReporteProductos() {
         setTitle("Reporte de Productos y Medicamentos");
@@ -22,19 +32,27 @@ public class ReporteProductos extends JFrame {
         tablaProductos = new JTable(modeloTabla);
 
         JScrollPane scrollPane = new JScrollPane(tablaProductos);
-        btnGenerarPDF = new JButton("Generar PDF");
+        btnExportarTxt = new JButton("Exportar como TXT");
 
         cargarDatos();
 
-        btnGenerarPDF.addActionListener(e -> generarPDF());
+        btnExportarTxt.addActionListener(e -> exportarComoTxt());
 
         add(scrollPane, BorderLayout.CENTER);
-        add(btnGenerarPDF, BorderLayout.SOUTH);
+        add(btnExportarTxt, BorderLayout.SOUTH);
         setVisible(true);
     }
 
     private void cargarDatos() {
-        try (BufferedReader reader = new BufferedReader(new FileReader("productos.txt"))) {
+        modeloTabla.setRowCount(0); // Limpia la tabla
+        File archivo = new File("productos.txt");
+
+        if (!archivo.exists()) {
+            JOptionPane.showMessageDialog(this, "El archivo productos.txt no existe.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(archivo))) {
             String linea;
             while ((linea = reader.readLine()) != null) {
                 String[] partes = linea.split(",");
@@ -46,39 +64,36 @@ public class ReporteProductos extends JFrame {
                 }
             }
         } catch (IOException e) {
-            JOptionPane.showMessageDialog(this, "Error al leer productos.txt");
+            JOptionPane.showMessageDialog(this, "Error al leer productos.txt", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    private void generarPDF() {
-        Document documento = new Document();
-        try {
-            PdfWriter.getInstance(documento, new FileOutputStream("ReporteProductos.pdf"));
-            documento.open();
-            documento.add(new Paragraph("Reporte de Productos y Medicamentos\n\n"));
+    private void exportarComoTxt() {
+        File archivo = new File("ReporteProductos.txt");
 
-            PdfPTable tablaPDF = new PdfPTable(5);
-            tablaPDF.addCell("Nombre");
-            tablaPDF.addCell("Tipo");
-            tablaPDF.addCell("Cantidad");
-            tablaPDF.addCell("Stock Mínimo");
-            tablaPDF.addCell("Fecha Vencimiento");
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(archivo))) {
+            writer.write("=== REPORTE DE PRODUCTOS Y MEDICAMENTOS ===\n\n");
 
             for (int i = 0; i < modeloTabla.getRowCount(); i++) {
-                for (int j = 0; j < modeloTabla.getColumnCount(); j++) {
-                    tablaPDF.addCell(modeloTabla.getValueAt(i, j).toString());
-                }
+                writer.write("Nombre: " + modeloTabla.getValueAt(i, 0) + " | ");
+                writer.write("Tipo: " + modeloTabla.getValueAt(i, 1) + " | ");
+                writer.write("Cantidad: " + modeloTabla.getValueAt(i, 2) + " | ");
+                writer.write("Stock Mínimo: " + modeloTabla.getValueAt(i, 3) + " | ");
+                writer.write("Vence: " + modeloTabla.getValueAt(i, 4) + "\n");
             }
 
-            documento.add(tablaPDF);
-            documento.close();
-            JOptionPane.showMessageDialog(this, "PDF generado exitosamente.");
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Error al generar PDF: " + e.getMessage());
+            writer.flush();
+            JOptionPane.showMessageDialog(this, "Archivo exportado exitosamente como: " + archivo.getName());
+
+            // Abre automáticamente el archivo
+            Desktop.getDesktop().open(archivo);
+
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "Error al exportar archivo: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    // Método principal para ejecutar la aplicación
+    // Método principal para ejecutar esta ventana por separado
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> new ReporteProductos());
     }

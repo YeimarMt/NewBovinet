@@ -144,29 +144,41 @@ public class VerMedicamentos extends JFrame {
     }
 
     private void cargarMedicamentos() {
-        modelo.setRowCount(0);
+    modelo.setRowCount(0);
+    File archivo = new File("productos.txt");
 
-        try (BufferedReader reader = new BufferedReader(new FileReader("productos.txt"))) {
-            String linea;
-            while ((linea = reader.readLine()) != null) {
-                if (!linea.contains("Tipo: Medicamento")) continue;
-
-                String nombre = extraerCampo(linea, "Nombre:");
-                String tipo = "Medicamento";
-                String cantidadStr = extraerCampo(linea, "Cantidad:");
-                String[] partes = cantidadStr.split(" ");
-                int cantidad = Integer.parseInt(partes[0]);
-                String unidad = partes.length >= 2 ? partes[1] : "";
-
-                int stockMin = Integer.parseInt(extraerCampo(linea, "Stock Mínimo:"));
-                String vence = extraerCampo(linea, "Vence:");
-
-                modelo.addRow(new Object[]{nombre, tipo, cantidad, unidad, stockMin, vence, "Mover"});
-            }
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Error leyendo productos.txt: " + e.getMessage());
-        }
+    if (!archivo.exists()) {
+        JOptionPane.showMessageDialog(this, "El archivo productos.txt no existe.");
+        return;
     }
+
+    try (BufferedReader reader = new BufferedReader(new FileReader(archivo))) {
+        String linea;
+        while ((linea = reader.readLine()) != null) {
+            String[] partes = linea.split(",");
+
+            if (partes.length < 5) continue;
+
+            String nombre = partes[0].trim();
+            String tipo = partes[1].trim();
+
+            if (!tipo.equalsIgnoreCase("Medicamento")) continue;
+
+            String cantidadUnidad = partes[2].trim();
+            String[] cantidadPartes = cantidadUnidad.split(" ", 2);
+            int cantidad = Integer.parseInt(cantidadPartes[0]);
+            String unidad = cantidadPartes.length > 1 ? cantidadPartes[1] : "";
+
+            int stockMin = Integer.parseInt(partes[3].trim());
+            String vence = partes[4].trim();
+
+            modelo.addRow(new Object[]{nombre, tipo, cantidad, unidad, stockMin, vence, "Mover"});
+        }
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this, "Error leyendo productos.txt: " + e.getMessage());
+    }
+}
+
 
     private String extraerCampo(String linea, String campo) {
         int inicio = linea.indexOf(campo);

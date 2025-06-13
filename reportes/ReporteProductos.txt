@@ -1,0 +1,5 @@
+REPORTE DE PRODUCTOS Y MEDICAMENTOS
+Exportado el: 2025-06-12 21:12:34
+
+Nombre | Tipo | Cantidad | Stock Mínimo | Fecha Vencimiento
+-----------------------------------------------------------------

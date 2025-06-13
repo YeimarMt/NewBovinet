@@ -1,0 +1,13 @@
+Exportado el: 2025-06-12 21:02:52
+
+=== DATOS DEL ANIMAL ===
+ID: 01
+Nombre: Claus
+Raza: Caballo
+Fecha Nacimiento: 14/07/2022
+
+=== HISTORIAL CLÍNICO Y REPRODUCTIVO ===
+- [Control Sanitario] - Fecha: 11/02/2025
+- [Vacunación] - Fecha: 21/03/2025
+- [Preñez] - Fecha: 29/04/2025
+- [Vacunación] - Fecha: 31/05/2025

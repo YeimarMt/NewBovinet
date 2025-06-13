@@ -5,37 +5,73 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 
 public class IniciarSesion extends JFrame {
-
     public IniciarSesion(JFrame parent) {
-        parent.dispose(); // Cierra ventana anterior
+        parent.dispose();
 
         setTitle("Iniciar Sesión");
-        setSize(700, 400);
+        setSize(1024, 600);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        // Panel izquierdo con el formulario
-        JPanel formPanel = new JPanel(new GridBagLayout());
-        formPanel.setBackground(new Color(242, 242, 242)); // Fondo gris claro
+        // Panel principal con fondo degradado
+        JPanel mainPanel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2d = (Graphics2D) g;
+                g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+                int w = getWidth();
+                int h = getHeight();
+                Color color1 = new Color(46, 139, 87);
+                Color color2 = new Color(34, 139, 34);
+                GradientPaint gp = new GradientPaint(0, 0, color1, w, h, color2);
+                g2d.setPaint(gp);
+                g2d.fillRect(0, 0, w, h);
+            }
+        };
+        mainPanel.setLayout(new GridBagLayout());
 
-        JPanel card = new JPanel(new GridLayout(6, 2, 10, 10));
-        card.setBackground(Color.WHITE);
-        card.setBorder(BorderFactory.createEmptyBorder(20, 30, 20, 30));
-        card.setPreferredSize(new Dimension(300, 280));
+        // Panel del formulario con efecto de cristal
+        JPanel formPanel = new JPanel();
+        formPanel.setLayout(new GridBagLayout());
+        formPanel.setOpaque(false);
+        formPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
+
+        // Panel interno con efecto de cristal
+        JPanel glassPanel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2d = (Graphics2D) g;
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2d.setColor(new Color(255, 255, 255, 200));
+                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 50, 50);
+            }
+        };
+        glassPanel.setLayout(new GridBagLayout());
+        glassPanel.setOpaque(false);
+        glassPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+        glassPanel.setPreferredSize(new Dimension(350, 400));
+
+        // Título
+        JLabel titleLabel = new JLabel("Iniciar Sesión");
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 24));
+        titleLabel.setForeground(new Color(46, 139, 87));
+        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // Campos del formulario
-        JTextField correo = new JTextField();
-        JPasswordField clave = new JPasswordField();
+        JTextField correo = createStyledTextField("Correo electrónico");
+        JPasswordField clave = createStyledPasswordField("Contraseña");
 
-        JButton btnIniciar = new JButton("Iniciar Sesión");
-        btnIniciar.setBackground(new Color(46, 139, 87));
-        btnIniciar.setForeground(Color.WHITE);
-        btnIniciar.setFocusPainted(false);
-        btnIniciar.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        // Botones
+        JButton btnIniciar = createStyledButton("Iniciar Sesión");
+        JButton btnVolver = createStyledButton("Volver");
 
+        // Acción del botón Iniciar Sesión
         btnIniciar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -55,7 +91,7 @@ public class IniciarSesion extends JFrame {
 
                             if (correoArchivo.equals(correoIngresado) && claveArchivo.equals(claveIngresada)) {
                                 encontrado = true;
-                                rolUsuario = datos[3]; // Usuario o Administrador
+                                rolUsuario = datos[3];
                                 break;
                             }
                         }
@@ -68,49 +104,106 @@ public class IniciarSesion extends JFrame {
 
                 if (encontrado) {
                     JOptionPane.showMessageDialog(null, "Inicio de sesión exitoso como " + rolUsuario, "Bienvenido", JOptionPane.INFORMATION_MESSAGE);
-                    dispose(); // Cerrar esta ventana
-                    new PanelAnimales(rolUsuario); // Mostrar panel según el rol
+                    dispose();
+                    new PanelAnimales(rolUsuario);
                 } else {
                     JOptionPane.showMessageDialog(null, "Correo o contraseña incorrectos.", "Acceso denegado", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
 
-        JButton btnVolver = new JButton("Volver");
-        btnVolver.setBackground(new Color(46, 139, 87));
-        btnVolver.setForeground(Color.WHITE);
-        btnVolver.setFocusPainted(false);
-        btnVolver.setFont(new Font("Segoe UI", Font.BOLD, 14));
-
+        // Acción del botón Volver
         btnVolver.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                dispose(); // Cierra esta ventana
-                Main.main(null); // Reabre la ventana principal
+                dispose();
+                Main.main(null);
             }
         });
 
-        // Agregar componentes al "card"
-        card.add(new JLabel("Correo:"));
-        card.add(correo);
-        card.add(new JLabel("Contraseña:"));
-        card.add(clave);
-        card.add(new JLabel()); // Espacio vacío
-        card.add(btnIniciar);
-        card.add(new JLabel()); // Espacio vacío
-        card.add(btnVolver);
+        // Configuración del GridBagLayout
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridwidth = GridBagConstraints.REMAINDER;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 0, 5, 0);
 
-        formPanel.add(card, new GridBagConstraints());
+        JLabel correoLabel = new JLabel("Correo electrónico:");
+        correoLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        correoLabel.setForeground(new Color(0, 100, 0));
+        correoLabel.setHorizontalAlignment(SwingConstants.LEFT);
+        correoLabel.setBorder(new EmptyBorder(0, 5, 0, 0));
 
-        // Imagen a la derecha
-        ImageIcon icon = new ImageIcon("img/vaquita.jpg");
-        Image scaled = icon.getImage().getScaledInstance(300, 400, Image.SCALE_SMOOTH);
-        JLabel imageLabel = new JLabel(new ImageIcon(scaled));
+        JLabel claveLabel = new JLabel("Contraseña:");
+        claveLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        claveLabel.setForeground(new Color(0, 100, 0));
+        claveLabel.setHorizontalAlignment(SwingConstants.LEFT);
+        claveLabel.setBorder(new EmptyBorder(0, 5, 0, 0));
 
-        // Agregar paneles a la ventana
-        add(formPanel, BorderLayout.WEST);
-        add(imageLabel, BorderLayout.EAST);
+        // Agregar componentes al panel de cristal
+        glassPanel.add(titleLabel, gbc);
+        glassPanel.add(Box.createVerticalStrut(10)); // Espacio después del título
+        glassPanel.add(correoLabel, gbc);
+        glassPanel.add(correo, gbc);
+        glassPanel.add(claveLabel, gbc);
+        glassPanel.add(clave, gbc);
+        glassPanel.add(btnIniciar, gbc);
+        glassPanel.add(btnVolver, gbc);
+
+        // Agregar el panel de cristal al panel del formulario
+        formPanel.add(glassPanel);
+        mainPanel.add(formPanel);
+
+        // Agregar el panel principal a la ventana
+        add(mainPanel, BorderLayout.CENTER);
 
         setVisible(true);
+    }
+
+    private JTextField createStyledTextField(String placeholder) {
+        JTextField textField = new JTextField(20);
+        textField.setPreferredSize(new Dimension(300, 35));
+        textField.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        textField.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(46, 139, 87), 1),
+            BorderFactory.createEmptyBorder(3, 8, 3, 8)
+        ));
+        textField.setBackground(new Color(255, 255, 255, 230));
+        return textField;
+    }
+
+    private JPasswordField createStyledPasswordField(String placeholder) {
+        JPasswordField passwordField = new JPasswordField(20);
+        passwordField.setPreferredSize(new Dimension(300, 35));
+        passwordField.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        passwordField.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(46, 139, 87), 1),
+            BorderFactory.createEmptyBorder(3, 8, 3, 8)
+        ));
+        passwordField.setBackground(new Color(255, 255, 255, 230));
+        return passwordField;
+    }
+
+    private JButton createStyledButton(String text) {
+        JButton button = new JButton(text);
+        button.setPreferredSize(new Dimension(300, 35));
+        button.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        button.setForeground(Color.WHITE);
+        button.setBackground(new Color(46, 139, 87));
+        button.setFocusPainted(false);
+        button.setBorderPainted(false);
+        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        // Efecto hover
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                button.setBackground(new Color(34, 139, 34));
+            }
+
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                button.setBackground(new Color(46, 139, 87));
+            }
+        });
+
+        return button;
     }
 }

@@ -1,14 +1,29 @@
-import java.awt.*;
-import java.io.*;
+import java.awt.BorderLayout;
+import java.awt.Desktop;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
-import javax.swing.*;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
 
 public class VerHojasDeVida extends JFrame {
     private JTextField idField;
     private JTextArea resultadoArea;
     private JButton exportarBtn;
 
-    // Constructor sin parámetros (por defecto)
     public VerHojasDeVida() {
         setTitle("Hoja de Vida del Animal");
         setSize(500, 520);
@@ -16,13 +31,13 @@ public class VerHojasDeVida extends JFrame {
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        // Panel superior con campo de ID y botones
+        // Panel superior
         JPanel topPanel = new JPanel(new FlowLayout());
         JLabel label = new JLabel("Ingrese ID del Animal:");
         idField = new JTextField(10);
         JButton buscarBtn = new JButton("Buscar");
         exportarBtn = new JButton("Exportar como TXT");
-        exportarBtn.setEnabled(false); // Solo se habilita si hay contenido
+        exportarBtn.setEnabled(false);
 
         topPanel.add(label);
         topPanel.add(idField);
@@ -35,7 +50,7 @@ public class VerHojasDeVida extends JFrame {
         resultadoArea.setEditable(false);
         JScrollPane scroll = new JScrollPane(resultadoArea);
 
-        // Agregar componentes al frame
+        // Agregar al frame
         add(topPanel, BorderLayout.NORTH);
         add(scroll, BorderLayout.CENTER);
 
@@ -126,11 +141,23 @@ public class VerHojasDeVida extends JFrame {
             return;
         }
 
-        File archivo = new File("HojaDeVida_" + id + ".txt");
+        // Añadir fecha de exportación al inicio
+        String fechaExportacion = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date());
+        contenido = "Exportado el: " + fechaExportacion + "\n\n" + contenido;
+
+        // Crear carpeta "reportes" si no existe
+        File carpeta = new File("reportes");
+        if (!carpeta.exists()) carpeta.mkdir();
+
+        File archivo = new File(carpeta, "HojaDeVida_" + id + ".txt");
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(archivo))) {
             writer.write(contenido);
-            JOptionPane.showMessageDialog(this, "Hoja de vida exportada como: " + archivo.getName(), "Éxito", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Hoja de vida exportada como: " + archivo.getAbsolutePath(), "Éxito", JOptionPane.INFORMATION_MESSAGE);
+
+            // Abrir el archivo automáticamente
+            Desktop.getDesktop().open(archivo);
+
         } catch (IOException e) {
             JOptionPane.showMessageDialog(this, "Error al exportar el archivo.", "Error", JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();

@@ -1,12 +1,25 @@
-import java.awt.*;
-import java.io.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
+import java.util.Map;
 
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
 
 public class ControlesPendientes extends JFrame {
     private DefaultTableModel modelo;
@@ -16,6 +29,7 @@ public class ControlesPendientes extends JFrame {
         setSize(700, 400);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setLayout(new BorderLayout());
 
         modelo = new DefaultTableModel(new Object[]{"ID", "Nombre", "Último Control", "Estado"}, 0);
         JTable tabla = new JTable(modelo);
@@ -23,6 +37,23 @@ public class ControlesPendientes extends JFrame {
         add(scrollPane, BorderLayout.CENTER);
 
         cargarDatos();
+
+        // Panel inferior con botón "Volver"
+        JPanel bottomPanel = new JPanel();
+        JButton btnVolver = new JButton("Volver");
+        btnVolver.setBackground(new Color(46, 139, 87));
+        btnVolver.setForeground(Color.BLACK);
+        btnVolver.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        btnVolver.setFocusPainted(false);
+        btnVolver.setPreferredSize(new Dimension(100, 35));
+
+        btnVolver.addActionListener(e -> {
+            dispose(); // Cierra esta ventana
+            new PanelAnimales(rol); // Regresa al panel de animales
+        });
+
+        bottomPanel.add(btnVolver);
+        add(bottomPanel, BorderLayout.SOUTH);
 
         // Para administrador, doble clic abre hoja de vida
         if (rol.equals("Administrador")) {
@@ -32,8 +63,8 @@ public class ControlesPendientes extends JFrame {
                         int fila = tabla.getSelectedRow();
                         if (fila != -1) {
                             String id = modelo.getValueAt(fila, 0).toString();
-                            new VerHojasDeVida();
-
+                            dispose(); // Cierra esta ventana
+                            new VerHojasDeVida(); // Abre hoja de vida
                         }
                     }
                 }
